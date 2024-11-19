@@ -14,5 +14,5 @@ def update(frame):
     scater.set_offsets(np.c_[x[:, frame], y[:, frame]])
     return scater,
 ani = FuncAnimation(fig, update, frames=T, interval=100, blit=True)
-ani.save('animation_1.mp4', fps=10)  # Uncomment to save as an mp4 file
+ani.save('animation_1.mp4', fps=100)  # Uncomment to save as an mp4 file
 plt.show()
