@@ -2,24 +2,50 @@ from particle_class import _particle_
 import numpy as np 
 import matplotlib.pyplot as plt
 
+def positions(N=100,T=300,c=0.001, xy=True):
+    m = 1e-10
+    eta = 0.001
+    radius = 1e-5
+    kb = 1.3806488e-23
+    kappa = np.sqrt(c)/0.304*1e9
+    tau = 6*np.pi*eta*radius/((kappa)**2*kb*T)
+    D = kb*T/(6*np.pi*eta*radius)
+    time_steps = 1000
+    dt = (10/(tau*time_steps)) #aproximadamanet 10 segon 
+    vmax = 3e-4/(2*D*kappa)
+    def print_init(particle):
+        print('*'*10)
+        print('\n')
+        print(f'time steps :{time_steps}')
+        print(f'tau {tau}')
+        print(f'dt: {dt}')
+        print(f'concentration: {c} (M)')
+        print(f'kappa: {kappa} (m)^-1')
+        print(f'particle radius: {radius} (m)')
+        print(f'vmax: {vmax}')
+        print(f'DLVO_coef: {particle.DLVO}')
+        print(f'VanderWaals_coef: {particle.VanderWaals}')
 
-N = 100 #particles
-T = 373
-m = 1
-dt = 0.01
-c = 0.01
-time_steps = 10000
+    particles = [_particle_(T, m, c,n) for n in range(N)]
+    print_init(particles[0])
 
-particles = [_particle_(T, m,c, n) for n in range(N)]
-x = np.zeros(shape=(N,time_steps))
-y = np.zeros(shape=(N,time_steps))
-for t in range(time_steps):
-    forces = [particle.force(particles) for particle in particles]
+    x = np.zeros(shape=(N,time_steps))
+    y = np.zeros(shape=(N,time_steps))
     for n,particle in enumerate(particles):
-        particle.brownian_step(forces[n],dt)
-        x[n][t], y[n][t] = particle.pos
-
-np.savez('positions_brownian.npz', x=x, y=y)
+        x[n][0], y[n][0] = particle.pos
+    plt.scatter(x[:,0]/(particles[0].kappa*radius), y[:,0]/(particles[0].kappa*radius), s=1)
+    plt.xlabel(r'$x(\kappa^{-1})$')
+    plt.ylabel(r'$y(\kappa^{-1})$')
+#    plt.show()
+#   plt.close()
+    for t in range(time_steps):   
+        print(t/time_steps)
+        if xy:
+            forces = [particle.force_surface(particles) for particle in particles]
+            for n,particle in enumerate(particles):
+                particle.brownian_step_xy(forces[n],dt, 1)
+                x[n][t], y[n][t] = particle.pos/(kappa*radius)
+    np.savez(f'positions_brownian_c_{c}_T_{T}.npz', x=x, y=y)
 
 
 
