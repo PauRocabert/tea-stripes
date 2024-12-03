@@ -6,15 +6,19 @@ from correlation import analysis
 import os 
 
 list_dir = os.listdir('./')
-Temp = [300,320,320,340,360,380]
+Temp = [300,320,320,340,360]
 con = [0.001, 0.01, 0.1,1.0]
 min_dist = np.zeros(shape=(len(Temp), len(con)))
+xy = True
 for i,T in enumerate(Temp):
     for j,c in enumerate(con):
-        data = f'positions_brownian_c_{c}_T_{T}.npz'
+        if xy:
+            data = f'positions_brownian_xy_c_{c}_T_{T}.npz'
+        else:
+            data = f'positions_brownian_xz_c_{c}_T_{T}.npz'
         if not(data in list_dir):
             print(data)
-            positions(T=T, c=c, xy=True)
+            positions(T=T, c=c, xy=xy)
             min_dist[i][j]=analysis(data,c=c, t=T)
         if not(f'animation_c={c}_T={T}.mp4' in list_dir):
             x,y=np.load(data)['x'], np.load(data)['y']

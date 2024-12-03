@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 def positions(N=100,T=300,c=0.001, xy=True):
     m = 1e-10
     eta = 0.001
-    radius = 1e-5
+    radius = 1e-4
     kb = 1.3806488e-23
     kappa = np.sqrt(c)/0.304*1e9
     tau = 6*np.pi*eta*radius/((kappa)**2*kb*T)
@@ -38,14 +38,25 @@ def positions(N=100,T=300,c=0.001, xy=True):
     plt.ylabel(r'$y(\kappa^{-1})$')
 #    plt.show()
 #   plt.close()
-    for t in range(time_steps):   
-        print(t/time_steps)
-        if xy:
+    if xy:
+        for t in range(time_steps):   
+            print(t/time_steps)
             forces = [particle.force_surface(particles) for particle in particles]
             for n,particle in enumerate(particles):
                 particle.brownian_step_xy(forces[n],dt, 1)
                 x[n][t], y[n][t] = particle.pos/(kappa*radius)
-    np.savez(f'positions_brownian_c_{c}_T_{T}.npz', x=x, y=y)
+        np.savez(f'positions_brownian_xy_c_{c}_T_{T}.npz', x=x, y=y)
+    else:
+        for t in range(time_steps):
+            print(t/time_steps)
+            forces = [particle.force_vertical(particles) for particle in particles]
+            for n,particle in enumerate(particles):
+                particle.brownian_step_xz(forces[n],dt, 1)
+                x[n][t], y[n][t] = particle.pos/(kappa*radius)
+        np.savez(f'positions_brownian_xz_c_{c}_T_{T}.npz', x=x, y=y)
+            
+
+    
 
 
 

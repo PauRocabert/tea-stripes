@@ -1,5 +1,6 @@
 import numpy as np
 import math
+from gauss_seidel import vel
 
 
 
@@ -16,7 +17,7 @@ class _particle_():
         I = c*Na*1e3
         kappa = 2.2912074e-3*np.sqrt(I/T)
         phi0 = 0.03
-        self.R = 1e-5 #m
+        self.R = 1e-4 #m
         self.kappa = kappa
 #bulk DLVO
 
@@ -34,10 +35,11 @@ class _particle_():
         self.lengh = 2*np.pi/(2.64)*1e-2*kappa #wavelenght 
 #        self.v = np.array([np.random.normal(loc=0, scale = sigma), np.random.normal(loc=0, scale = sigma)])
 #        self.pos = np.array([np.random.randint(low = 0, high = 2)*self.lengh+np.random.normal(loc=0, scale = self.lengh/20), np.random.normal(loc=0, scale = 10)])
-        self.pos = np.array([ np.random.uniform(low= -self.R*kappa, high=self.R*kappa), np.random.uniform(low= -self.R*kappa, high=self.R*kappa)])*2000
+        self.pos = np.array([ np.random.uniform(low= -self.R*kappa, high=self.R*kappa), np.random.uniform(low= -self.R*kappa, high=self.R*kappa)])*1000
         self.z_max = self.R*kappa*2000
         self.F0 = 20e5
         self.l = 1e-9
+
     def force_surface(self, particles):
         f = np.zeros(2)
         for particle in particles:
@@ -67,17 +69,10 @@ class _particle_():
 
     def brownian_step_xy(self, force, dt, convection):
         f = 1/(2*self.kappa*kb*self.T)*force
-        vmax = 300e-6 #m/s
+        vmax = 300e-5 #m/s
         print(f)
         rdot =  f + np.random.normal(scale = np.sqrt(dt), size=2) + convection*np.sin(self.pos[0]*2*np.pi/self.lengh)*(vmax/(2*self.D*self.kappa))
         self.pos += rdot*dt
-    def vel(self, z):
-        vmax = 1000e-6 #m/s
-        q0= 7.2569
-        q1 = 7.3711
-        q2 = 3.664
-        vz = vmax*(np.sin(q0*z) - 0.033193*np.cos(q2*z)*np.sinh(q1*z) + 0.033146*np.cosh(q1*z)*np.sin(q2*z))
-        return vz
     def brownian_step_xz(self, force, dt, convection):
         f = 1/(2*self.kappa*kb*self.T)*force
         rdot =  f + np.random.normal(scale = np.sqrt(dt), size=2) + convection*np.array([np.sin(self.pos[0]*2*np.pi/self.lengh),vel(self.pos[1]/self.z_max)])*(1/(2*self.D*self.kappa))

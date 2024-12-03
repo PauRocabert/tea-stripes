@@ -6,8 +6,8 @@ def vz(K=2.682,T=343.15, Ra= 1100.65, p=0, d=1, nu=1):
     theta = T - 273.15 #temperatura en celsius
     Pr =5000/(theta**2 + 155*theta + 3700)
     Ra = 1100.65
-    sigma = p*d**2/nu
-    N = 1001
+    sigma = 0
+    N = 501
     dz = 1/(N-1)
     dz2 = dz**2
 
@@ -22,7 +22,7 @@ def vz(K=2.682,T=343.15, Ra= 1100.65, p=0, d=1, nu=1):
         if n%1000 ==0:
             print(epsilon)
             print(1/N*np.sqrt(np.dot(W-np.sin(k*x),W-np.sin(k*x))))
-        if epsilon < 0.001:
+        if epsilon < 0.01:
             break
         epsilon_0 = epsilon 
         epsilon =0 
@@ -44,7 +44,7 @@ def vz(K=2.682,T=343.15, Ra= 1100.65, p=0, d=1, nu=1):
             W[i] = W_new
             F[i] = F_new
             G[i] = G_new
-        if 2*epsilon_0 < epsilon:
+        if epsilon_0 < epsilon:
             break
 
     plt.plot(x,W)
@@ -53,3 +53,10 @@ def vz(K=2.682,T=343.15, Ra= 1100.65, p=0, d=1, nu=1):
 vz()
 
 
+def vel(z):
+        vmax = 1000e-6 #m/s
+        q0= 7.2569
+        q1 = 7.3711
+        q2 = 3.664
+        vz = vmax*(np.sin(q0*z) - 0.033193*np.cos(q2*z)*np.sinh(q1*z) + 0.033146*np.cosh(q1*z)*np.sin(q2*z))
+        return vz
